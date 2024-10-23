@@ -1,8 +1,9 @@
 import discord
 import os
 import datetime
+import asyncio
 
-from discord.ext.commands import Bot, when_mentioned_or
+from discord.ext.commands import Bot, when_mentioned_or, when_mentioned
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from discord.ext.commands import CommandNotFound, CommandOnCooldown, MissingPermissions, MissingRequiredArgument, BadArgument, MemberNotFound
@@ -12,7 +13,7 @@ from constants import AUTO_UPDATE_TIME
 
 intents = discord.Intents.default()
 intents.members = False
-client = Bot(case_insensitive=True, description="Lockout Bot", command_prefix=when_mentioned_or("."), intents=intents)
+client = Bot(case_insensitive=True, description="Lockout Bot", command_prefix=(when_mentioned), intents=intents)
 
 logging_channel = None
 
@@ -36,6 +37,13 @@ async def on_ready():
 async def update():
     await tasks.update_matches(client)
     await tasks.update_rounds(client)
+
+@client.command(name='greet')
+async def greet(ctx, *, name: str = None):
+    if name is None:
+        await ctx.send(f"Hello, {ctx.author.name}!")
+    else:
+        await ctx.send(f"Hello, {name}!")
 
 
 @client.event
@@ -79,15 +87,19 @@ async def on_command_error(ctx: discord.ext.commands.Context, error: Exception):
         desc += f"**{str(error)}**"
         await logging_channel.send(desc)
 
-
-if __name__ == "__main__":
+async def loood():
     for filename in os.listdir('./cogs'):
+        # print(filename)
         if filename.endswith('.py'):
             try:
-                client.load_extension(f'cogs.{filename[:-3]}')
+                await client.load_extension(f'cogs.{filename[:-3]}')
             except Exception as e:
                 print(f'Failed to load file {filename}: {str(e)}')
-                print(str(e))
 
+async def main():
+    await loood()
     token = os.environ.get('LOCKOUT_BOT_TOKEN')
-    client.run(token)
+    await client.start(token)
+
+if __name__ == "__main__":
+    asyncio.run(main())

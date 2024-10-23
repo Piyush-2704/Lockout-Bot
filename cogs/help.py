@@ -77,6 +77,7 @@ class Help(commands.Cog):
     @commands.cooldown(1, 5, BucketType.user)
     async def help(self, ctx, *, cmd: str=None):
         """Shows help for various commands"""
+        print("Hello")
         if cmd is None:
             embeds = self.make_help_embed(ctx)
             emotes = ['1⃣', '2⃣', '3⃣', '4⃣']
@@ -105,5 +106,5 @@ class Help(commands.Cog):
             await ctx.send(embed=self.make_cmd_embed(command))
 
 
-def setup(client):
-    client.add_cog(Help(client))
+async def setup(client):
+    await client.add_cog(Help(client))

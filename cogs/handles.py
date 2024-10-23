@@ -56,6 +56,7 @@ class Handles(commands.Cog):
 
     @commands.group(brief='Commands related to handles! Type .handle for more details', invoke_without_command=True)
     async def handle(self, ctx):
+        print("I am in handle")
         await ctx.send(embed=self.make_handle_embed(ctx))
 
     @handle.command(brief="Set someone's handle (Admin/Mod/Lockout Manager only)")
@@ -204,6 +205,7 @@ class Handles(commands.Cog):
         await ctx.send(embed=embed)
 
     @handle.command(brief="Get handle list")
+    # @commands.command(name="list")
     async def list(self, ctx):
         data = self.db.get_all_handles(ctx.guild.id)
         if len(data) == 0:
@@ -221,5 +223,5 @@ class Handles(commands.Cog):
         await paginator.Paginator(data, ["User", "Handle", "Rating"], f"Handle List", HANDLES_PER_PAGE).paginate(ctx, self.client)
 
 
-def setup(client):
-    client.add_cog(Handles(client))
+async def setup(client):
+    await client.add_cog(Handles(client))
